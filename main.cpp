@@ -97,7 +97,7 @@ void encode_frame(std::shared_ptr<AVFrame> frame, AVCodecContext* output_codec_c
     av_packet_free(&output_packet);
 }
 
-void encode_pass(const char* input_filename, const char* output_filename, bool is_first_pass) {
+void encode_pass(const char* input_filename, const char* output_filename, bool is_first_pass, int bit_rate) {
     AVFormatContext* input_format_context = nullptr;
     if (avformat_open_input(&input_format_context, input_filename, nullptr, nullptr) != 0) {
         throw std::runtime_error("Could not open input file.");
@@ -156,27 +156,22 @@ void encode_pass(const char* input_filename, const char* output_filename, bool i
         output_codec_context->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
     }
 
-
     output_codec_context->thread_count = 32;
     output_codec_context->thread_type = FF_THREAD_FRAME;
 
-  
-    output_codec_context->bit_rate = 500000; 
-    output_codec_context->gop_size = 60; 
-    output_codec_context->max_b_frames = 3; 
+    output_codec_context->bit_rate = bit_rate;
+    output_codec_context->gop_size = 60;
+    output_codec_context->max_b_frames = 3;
 
     AVDictionary* codec_options = nullptr;
-    av_dict_set(&codec_options, "preset", "veryfast", 0); 
-    av_dict_set(&codec_options, "crf", "28", 0); 
-    av_dict_set(&codec_options, "tune", "film", 0); 
-    av_dict_set(&codec_options, "profile", "high", 0); 
+    av_dict_set(&codec_options, "preset", "veryfast", 0);
+    av_dict_set(&codec_options, "tune", "film", 0);
+    av_dict_set(&codec_options, "profile", "high", 0);
 
     if (is_first_pass) {
-        av_dict_set(&codec_options, "pass", "1", 0); 
-        av_dict_set(&codec_options, "b:v", "500k", 0); 
+        av_dict_set(&codec_options, "pass", "1", 0);
     } else {
-        av_dict_set(&codec_options, "pass", "2", 0); 
-        av_dict_set(&codec_options, "b:v", "500k", 0); 
+        av_dict_set(&codec_options, "pass", "2", 0);
     }
 
     if (avcodec_open2(output_codec_context, output_codec, &codec_options) < 0) {
@@ -190,7 +185,7 @@ void encode_pass(const char* input_filename, const char* output_filename, bool i
 
     avcodec_parameters_from_context(output_video_stream->codecpar, output_codec_context);
     output_video_stream->time_base = output_codec_context->time_base;
-    output_video_stream->avg_frame_rate = (AVRational){60, 1}; 
+    output_video_stream->avg_frame_rate = (AVRational){60, 1};
 
     if (!(output_format_context->oformat->flags & AVFMT_NOFILE)) {
         if (avio_open(&output_format_context->pb, output_filename, AVIO_FLAG_WRITE) < 0) {
@@ -294,8 +289,40 @@ void encode_pass(const char* input_filename, const char* output_filename, bool i
 }
 
 void encode(const char* input_filename, const char* output_filename) {
-    encode_pass(input_filename, "/dev/null", true);
-    encode_pass(input_filename, output_filename, false);
+    AVFormatContext* input_format_context = nullptr;
+    if (avformat_open_input(&input_format_context, input_filename, nullptr, nullptr) != 0) {
+        throw std::runtime_error("Could not open input file.");
+    }
+
+    if (avformat_find_stream_info(input_format_context, nullptr) < 0) {
+        avformat_close_input(&input_format_context);
+        throw std::runtime_error("Could not find stream info.");
+    }
+
+    int video_stream_index = av_find_best_stream(input_format_context, AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0);
+    if (video_stream_index < 0) {
+        avformat_close_input(&input_format_context);
+        throw std::runtime_error("Could not find video stream in the input file.");
+    }
+
+    AVStream* input_video_stream = input_format_context->streams[video_stream_index];
+
+    int64_t duration = input_video_stream->duration;
+    if (duration == AV_NOPTS_VALUE) {
+        duration = input_format_context->duration;
+    }
+
+    if (duration <= 0) {
+        throw std::runtime_error("Invalid duration detected.");
+    }
+
+    double duration_seconds = duration * av_q2d(input_video_stream->time_base);
+    int bit_rate = static_cast<int>((10.0 * 1024 * 1024 * 8) / duration_seconds);
+
+    std::cout << "Calculated Bitrate: " << bit_rate << " bps" << std::endl;
+
+    encode_pass(input_filename, "/dev/null", true, bit_rate);
+    encode_pass(input_filename, output_filename, false, bit_rate);
 }
 
 int main(int argc, char* argv[]) {
