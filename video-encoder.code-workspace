@@ -1,0 +1,25 @@
+{
+	"folders": [
+		{
+			"name": "ffmpeg-7.0.1",
+			"path": "../../Downloads/ffmpeg-7.0.1"
+		},
+		{
+			"name": "video_encoder",
+			"path": "."
+		},
+		{
+			"path": "../videoencoder"
+		},
+		{
+			"path": "../Video_Codec_SDK_12.2.72"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.py": "python",
+			"string": "cpp",
+			"exception": "cpp"
+		}
+	}
+}
