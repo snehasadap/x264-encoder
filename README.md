@@ -1,5 +1,5 @@
 # video-encoder
-The purpose of this encoder is to acheive a target file size of 10 MB with two-pass encoding
+The purpose of this encoder is to acheive a target file size of 10 MB with two-pass encoding 
 ## Instructions
 1. Install FFmpeg
 
