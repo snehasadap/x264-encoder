@@ -19,7 +19,7 @@ The purpose of this encoder is to acheive a target file size of 10 MB with two-p
     cmake ..
     make
     ```
-    From then on you can just run `make` to compile the encoder
+    From then on, you can just run `make` to compile the encoder.
    
 5. Run `main.cpp`
    ```sh
