@@ -26,7 +26,7 @@ The purpose of this encoder is to acheive a target file size of 10 MB with two-p
    ./VideoEncoder your-video-file.mov
    ```
   
-    Please specify the directory of your `.mov` file, it should look something like this: `\users\your-username\directory\your-video-file.mov`.
+    Please specify the directory of your `.mov` file, it should look something like this: `\Users\your-username\directory\your-video-file.mov`.
 
 ## Resources
 https://trac.ffmpeg.org/wiki/Encode/H.264
