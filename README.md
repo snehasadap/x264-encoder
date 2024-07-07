@@ -23,7 +23,7 @@ The purpose of this encoder is to acheive a target file size of 10 MB with two-p
    
 5. Run `main.cpp`
    ```sh
-   ./video_encoder your-video-file.mov
+   ./VideoEncoder your-video-file.mov
    ```
   
     Please specify the directory of your `.mov` file, it should look something like this: `\users\your-username\directory\your-video-file.mov`.
