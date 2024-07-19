@@ -8,7 +8,7 @@ The purpose of this encoder is to acheive a target file size of 10 MB with two-p
     ```
     If you don't have Homebrew installed, view [this](https://docs.brew.sh/Installation) page for setup instructions.
 
-2. Create a build directory (assuming your project is named `video-encoder`)
+2. Create your build directory (assuming your project is named `video-encoder`)
    ```sh
    mkdir -p video-encoder/build
    cd video-encoder/build
