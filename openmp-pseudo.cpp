@@ -1,4 +1,4 @@
-//Pseudo code of threaded H.264 encoder using taskqueing with OpenMP
+//Pseudo code of threaded H.264 encoder using task queue with OpenMP
 
 #pragma intel omp parallel taskqueing
 {
