@@ -1,4 +1,4 @@
-# video-encoder
+# x264-encoder
 The purpose of this encoder is to acheive a target file size of 10 MB with two-pass encoding. Renders in 60 fps.
 ## Instructions
 1. Install FFmpeg
